@@ -7,10 +7,10 @@ const PRECACHE = [
   '/script.js',
   '/manifest.json',
   // Add your 4 background images:
-'Bg1.jpg',
-  'Bg2.jpg',
-  'Bg3.jpg',
-  'Bg4.jpg'
+'/Bg1.jpg',
+  '/Bg2.jpg',
+  '/Bg3.jpg',
+  '/Bg4.jpg'
 ];
 
 /* ── Install: pre-cache all assets ── */
