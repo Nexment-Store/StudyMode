@@ -1,19 +1,24 @@
-const CACHE_NAME = 'newtab-v1';
+const CACHE_NAME = 'study-tab-v1';
+
+const BASE_PATH = '/StudyMode/';
 
 const PRECACHE = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/script.js',
-  '/manifest.json',
-  // Add your 4 background images:
-'/Bg1.jpg',
-  '/Bg2.jpg',
-  '/Bg3.jpg',
-  '/Bg4.jpg'
+  BASE_PATH,
+  BASE_PATH + 'index.html',
+  BASE_PATH + 'style.css',
+  BASE_PATH + 'script.js',
+  BASE_PATH + 'manifest.json',
+
+  // Images
+  BASE_PATH + 'Bg1.jpg',
+  BASE_PATH + 'Bg2.jpg',
+  BASE_PATH + 'Bg3.jpg',
+  BASE_PATH + 'Bg4.jpg',
+
+  BASE_PATH + 'logo.png'
 ];
 
-/* ── Install: pre-cache all assets ── */
+/* ── Install ── */
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE))
@@ -21,7 +26,7 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-/* ── Activate: clean up old caches ── */
+/* ── Activate ── */
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -35,29 +40,32 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-/* ── Fetch: cache-first strategy ── */
+/* ── Fetch ── */
 self.addEventListener('fetch', event => {
+  const request = event.request;
+
   event.respondWith(
-    caches.match(event.request).then(cached => {
+    caches.match(request).then(cached => {
       if (cached) return cached;
-      return fetch(event.request).then(response => {
-        // Cache valid GET responses
-        if (
-          event.request.method === 'GET' &&
-          response &&
-          response.status === 200 &&
-          response.type !== 'opaque'
-        ) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => {
-        // Fallback for navigation requests when offline
-        if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
-        }
-      });
+
+      return fetch(request)
+        .then(response => {
+          if (
+            request.method === 'GET' &&
+            response &&
+            response.status === 200 &&
+            response.type !== 'opaque'
+          ) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => {
+          if (request.mode === 'navigate') {
+            return caches.match(BASE_PATH + 'index.html');
+          }
+        });
     })
   );
 });
