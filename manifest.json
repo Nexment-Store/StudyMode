@@ -1,26 +1,21 @@
 {
-  "name": "Study Tqb",
-  "short_name": "Study Tab",
-  "description": "A beautiful Study tab page with clock and countdown timer",
-  "start_url": "/StudyMode/",
-  "scope": "/StudyMode/",
+  "name": "Wallpaper Dashboard",
+  "short_name": "Wallpaper",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
   "orientation": "landscape",
   "icons": [
     {
-      "src": "/StudyMode/logo.png",
+      "src": "icon.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "/StudyMode/logo.png",
+      "src": "icon.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
-  ],
-  "categories": ["utilities", "productivity"]
+  ]
 }
