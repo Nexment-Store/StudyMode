@@ -1,71 +1,43 @@
-const CACHE_NAME = 'study-tab-v1';
+const CACHE_NAME = 'my-site-cache-v1';
+// IMPORTANT: Add your repository name if this is not a custom domain
+const REPO_NAME = '/StudyMode'; 
 
-const BASE_PATH = '/StudyMode/';
-
-const PRECACHE = [
-  BASE_PATH,
-  BASE_PATH + 'index.html',
-  BASE_PATH + 'style.css',
-  BASE_PATH + 'script.js',
-  BASE_PATH + 'manifest.json',
-
-  // Images
-  BASE_PATH + 'Bg1.jpg',
-  BASE_PATH + 'Bg2.jpg',
-  BASE_PATH + 'Bg3.jpg',
-  BASE_PATH + 'Bg4.jpg',
-
-  BASE_PATH + 'logo.png'
+const URLS_TO_CACHE = [
+  `${REPO_NAME}/`,
+  `${REPO_NAME}/index.html`,
+  `${REPO_NAME}/logo.png`,
+  `${REPO_NAME}/file_00000000e62071fab031ced594acfd61.png`,
 ];
 
-/* ── Install ── */
-self.addEventListener('install', event => {
+// Install: Cache essential files
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE))
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(URLS_TO_CACHE);
+    })
   );
-  self.skipWaiting();
 });
 
-/* ── Activate ── */
-self.addEventListener('activate', event => {
+// Activate: Clean up old caches
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => caches.delete(key))
-      )
-    )
-  );
-  self.clients.claim();
-});
-
-/* ── Fetch ── */
-self.addEventListener('fetch', event => {
-  const request = event.request;
-
-  event.respondWith(
-    caches.match(request).then(cached => {
-      if (cached) return cached;
-
-      return fetch(request)
-        .then(response => {
-          if (
-            request.method === 'GET' &&
-            response &&
-            response.status === 200 &&
-            response.type !== 'opaque'
-          ) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
           }
-          return response;
         })
-        .catch(() => {
-          if (request.mode === 'navigate') {
-            return caches.match(BASE_PATH + 'index.html');
-          }
-        });
+      );
+    })
+  );
+});
+
+// Fetch: Serve from cache, then network
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
     })
   );
 });
