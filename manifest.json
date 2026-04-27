@@ -1,19 +1,20 @@
 {
-  "name": "Wallpaper Dashboard",
-  "short_name": "Wallpaper",
-  "start_url": "./index.html",
+  "name": "Stand By Mode",
+  "short_name": "Focus",
+  "description": "Focus on your studies.",
+  "start_url": "/StudyMode/",
+  "scope": "/StudyMode/",
   "display": "standalone",
-  "background_color": "#000000",
+  "background_color": "#ffffff",
   "theme_color": "#000000",
-  "orientation": "landscape",
   "icons": [
     {
-      "src": "icon.png",
+      "src": "logo.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon.png",
+      "src": "logo.png",
       "sizes": "512x512",
       "type": "image/png"
     }
