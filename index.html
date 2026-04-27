@@ -2,53 +2,137 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#000000" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Clock</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Wallpaper Dashboard</title>
+
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      background: url('file_00000000d48c71fa83edbc45a6f5ab13.png') no-repeat center center/cover;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+      color: white;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+    }
+
+    .info {
+      position: relative;
+      z-index: 2;
+      padding: 24px;
+    }
+
+    .time {
+      font-size: 48px;
+      font-weight: 600;
+    }
+
+    .date {
+      font-size: 18px;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .battery {
+      font-size: 14px;
+      margin-top: 6px;
+      opacity: 0.8;
+    }
+
+    @media (orientation: portrait) {
+      body {
+        align-items: center;
+        justify-content: center;
+      }
+
+      .info {
+        text-align: center;
+      }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Background -->
-  <div id="bg"></div>
-
-  <!-- Gradient overlay - bottom left darkening -->
   <div class="overlay"></div>
 
-  <!-- Clock + Date -->
-  <div class="clock-wrap" id="clockWrap" title="Double-click to set countdown">
-    <div class="time" id="timeDisplay">00:00</div>
-    <div class="date" id="dateDisplay">Thursday, Apr 16</div>
+  <div class="info">
+    <div class="time" id="time"></div>
+    <div class="date" id="date"></div>
+    <div class="battery" id="battery">Battery: --%</div>
   </div>
 
-  <!-- Timer Modal -->
-  <div class="modal-backdrop" id="modalBackdrop">
-    <div class="modal" id="timerModal">
-      <button class="close-btn" id="closeModal">&#x2715;</button>
-      <h2 class="modal-title">Set Countdown</h2>
-      <div class="time-inputs">
-        <div class="input-group">
-          <button class="stepper" data-target="hrInput" data-dir="up">&#9650;</button>
-          <input type="number" id="hrInput" min="0" max="23" value="0" />
-          <button class="stepper" data-target="hrInput" data-dir="down">&#9660;</button>
-          <span class="label">HR</span>
-        </div>
-        <div class="colon">:</div>
-        <div class="input-group">
-          <button class="stepper" data-target="minInput" data-dir="up">&#9650;</button>
-          <input type="number" id="minInput" min="0" max="59" value="0" />
-          <button class="stepper" data-target="minInput" data-dir="down">&#9660;</button>
-          <span class="label">MIN</span>
-        </div>
-      </div>
-      <button class="set-btn" id="setTimer">Set Timer</button>
-    </div>
-  </div>
+  <script>
+    function updateTime() {
+      const now = new Date();
 
-  <script src="script.js" defer></script>
+      const time = now.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      const date = now.toLocaleDateString([], {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      });
+
+      document.getElementById("time").textContent = time;
+      document.getElementById("date").textContent = date;
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    async function updateBattery() {
+      if ('getBattery' in navigator) {
+        const battery = await navigator.getBattery();
+
+        function setBattery() {
+          const level = Math.round(battery.level * 100);
+          document.getElementById("battery").textContent = "Battery: " + level + "%";
+        }
+
+        setBattery();
+
+        battery.addEventListener('levelchange', setBattery);
+      } else {
+        document.getElementById("battery").textContent = "Battery: Not supported";
+      }
+    }
+
+    updateBattery();
+
+    if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // Note: The scope must include the subfolder name
+    const scope = '/repository-name/';
+    
+    navigator.serviceWorker.register('/repository-name/sw.js', { scope: scope })
+      .then((registration) => {
+        console.log('ServiceWorker registered with scope:', registration.scope);
+      })
+      .catch((error) => {
+        console.error('ServiceWorker registration failed:', error);
+      });
+  });
+    }
+  </script>
+
 </body>
 </html>
